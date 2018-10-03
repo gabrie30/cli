@@ -561,10 +561,13 @@ func (o *oauth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	code, state := q.Get("code"), q.Get("state")
 
 	if code == "" || state == "" {
-		fmt.Printf("Invalid request received from: %v%v\n\n", req.RemoteAddr, req.RequestURI)
+		fmt.Fprintf(os.Stderr, "Invalid request received from: %v%v\n\n", req.RemoteAddr, req.RequestURI)
 		if req.RequestURI == "/robots.txt" {
-			fmt.Printf("** You may have an app or browser plugin that needs to be turned off **\n\n")
+			w.WriteHeader(http.StatusForbidden)
+			return
 		}
+
+		fmt.Fprintf(os.Stderr, "** You may have an app or browser plugin that needs to be turned off **\n\n")
 	}
 
 	if code == "" {
